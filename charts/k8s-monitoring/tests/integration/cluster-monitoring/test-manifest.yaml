@@ -1,18 +1,25 @@
 ---
 prerequisites:
-  - type: manifest
-    name: secretgen-controller
-    url: https://github.com/carvel-dev/secretgen-controller/releases/latest/download/release.yml
-  - type: manifest
-    name: prometheus-certificates
+  - name: cert-manager
+    type: helm
+    repo: https://charts.jetstack.io
+    chart: cert-manager
+    namespace: cert-manager
+    values:
+      installCRDs: true
+  - name: prometheus-namespace
+    type: manifest
+    file: charts/k8s-monitoring/tests/integration/cluster-monitoring/prometheus-namespace.yaml
+  - name: prometheus-certificates
+    type: manifest
     namespace: prometheus
-    file: .configs/certificates.yaml
-  - type: helm
-    name: prometheus
+    file: charts/k8s-monitoring/tests/integration/cluster-monitoring/certificates.yaml
+  - name: prometheus
+    type: helm
     repo: https://prometheus-community.github.io/helm-charts
     chart: prometheus
     namespace: prometheus
-    valuesFile: .configs/prometheus.yaml
+    valuesFile: charts/k8s-monitoring/tests/integration/cluster-monitoring/prometheus.yaml
   - type: helm
     name: loki
     repo: https://grafana.github.io/helm-charts

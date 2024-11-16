@@ -1,0 +1,50 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ca-cert
+spec:
+  isCA: true
+  commonName: ca-cert
+  secretName: root-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: ca-issuer
+spec:
+  ca:
+    secretName: root-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: prometheus-ssl
+spec:
+  commonName: prometheus-server
+  dnsNames:
+    - prometheus-server
+    - prometheus-server.prometheus.svc
+    - prometheus-server.prometheus.svc.cluster.local
+  secretName: prometheus-ssl
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: ca-issuer
+    kind: Issuer
+    group: cert-manager.io

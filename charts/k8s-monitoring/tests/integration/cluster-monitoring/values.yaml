@@ -11,7 +11,9 @@ destinations:
       username: promuser
       password: prometheuspassword
     tls:
-      insecureSkipVerify: true
+      caFrom: remote.kubernetes.secret.ca_ssl["tls.crt"]
+      certFrom: remote.kubernetes.secret.prometheus_ssl["tls.crt"]
+      keyFrom: remote.kubernetes.secret.prometheus_ssl["tls.key"]
   - name: localLoki
     type: loki
     url: http://loki.loki.svc:3100/loki/api/v1/push
@@ -34,9 +36,27 @@ selfReporting: {scrapeInterval: 1m}  # Force self-report to be generated within 
 
 alloy-metrics:
   enabled: true
+  extraConfig: |-
+    remote.kubernetes.secret "prometheus_ssl" {
+      name = "prometheus-ssl"
+      namespace = "prometheus"
+    }
+    remote.kubernetes.secret "ca_ssl" {
+      name = "root-secret"
+      namespace = "prometheus"
+    }
 
 alloy-singleton:
   enabled: true
+  extraConfig: |-
+    remote.kubernetes.secret "prometheus_ssl" {
+      name = "prometheus-ssl"
+      namespace = "prometheus"
+    }
+    remote.kubernetes.secret "ca_ssl" {
+      name = "root-secret"
+      namespace = "prometheus"
+    }
 
 alloy-logs:
   enabled: true
